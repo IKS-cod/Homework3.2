@@ -21,7 +21,7 @@ public class FacultyController {
 
     @GetMapping("{id}") //http:localhost:8080/student/id
     public Faculty getFaculty(@PathVariable Long id) {
-        return facultyService.get(id);
+        return facultyService.getFaculty(id);
     }
 
     @GetMapping //http:localhost:8080/student/id
@@ -35,13 +35,13 @@ public class FacultyController {
     }
 
     @PutMapping
-    public void editStudent(@RequestParam long id, @RequestBody Faculty faculty) {
-        facultyService.editFaculty(id, faculty);
+    public void updateStudent(@PathVariable long id, @RequestBody Faculty faculty) {
+        facultyService.updateFaculty(id, faculty);
     }
 
     @DeleteMapping("{id}")
-    public Faculty deleteFaculty(@PathVariable long id) {
-        return facultyService.deleteFaculty(id);
+    public void deleteFaculty(@PathVariable long id) {
+        facultyService.deleteFaculty(id);
     }
 
 

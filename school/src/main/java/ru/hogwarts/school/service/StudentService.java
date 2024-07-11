@@ -1,54 +1,49 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
 
 @Service
 public class StudentService {
-    private final Map<Long, Student> students = new HashMap<>();
-    private long countId = 0;
+    private final StudentRepository studentRepository;
 
-    public Student createStudent(Student student) {
-        student.setId(++countId);
-        students.put(countId, student);
-        return student;
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
-    public Student get(long id) {
-        if (!students.containsKey(id)) {
+    public Student createStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+    public Student getStudent(long id) {
+        if(studentRepository.findById(id).isEmpty()){
             throw new StudentNotFoundException(id);
         }
-        return students.get(id);
+        return studentRepository.findById(id).get();
     }
 
     public Collection<Student> findAllStudentForAge(int age) {
-        List<Student> studentList = new ArrayList<>();
-        for (Student student : students.values()) {
-            if (student.getAge() == age) {
-                studentList.add(student);
-            }
-        }
-        return Collections.unmodifiableList(studentList);
+        return studentRepository.findByAge(age);
     }
 
-    public void editStudent(long id, Student student) {
-        if (!students.containsKey(id)) {
+    public void updateStudent(long id, Student student) {
+        if(studentRepository.findById(id).isEmpty()){
             throw new StudentNotFoundException(id);
         }
-        Student oldStudent = students.get(id);
-        oldStudent.setName(student.getName());
-        oldStudent.setAge(student.getAge());
+        studentRepository.save(student);
     }
 
-    public Student deleteStudent(long id) {
-        if (!students.containsKey(id)) {
+    public void deleteStudent(long id) {
+        if(studentRepository.findById(id).isEmpty()){
             throw new StudentNotFoundException(id);
         }
-       return students.remove(id);
+        studentRepository.deleteById(id);
     }
 }

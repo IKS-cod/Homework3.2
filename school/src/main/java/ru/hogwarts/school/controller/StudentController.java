@@ -23,7 +23,7 @@ public class StudentController {
     }
     @GetMapping("{id}") //http:localhost:8080/student/id
     public Student getStudent(@PathVariable long id) {
-        return studentService.get(id);
+        return studentService.getStudent(id);
     }
 
     @PostMapping
@@ -32,13 +32,13 @@ public class StudentController {
     }
 
     @PutMapping("{id}")
-    public void editStudent(@RequestParam long id, @RequestBody Student student) {
-        studentService.editStudent(id, student);
+    public void updateStudent(@PathVariable long id, @RequestBody Student student) {
+        studentService.updateStudent(id, student);
     }
 
     @DeleteMapping("{id}")
-    public Student deleteStudent(@PathVariable long id) {
-       return studentService.deleteStudent(id);
+    public void deleteStudent(@PathVariable long id) {
+        studentService.deleteStudent(id);
     }
 
 
