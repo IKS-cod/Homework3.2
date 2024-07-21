@@ -9,6 +9,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
+
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
@@ -67,4 +68,6 @@ public class StudentService {
     public Faculty findStudentsFaculty(long id) {
         return getStudent(id).getFaculty();
     }
+
+
 }
