@@ -3,6 +3,7 @@ package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -14,35 +15,40 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
-
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
 @Transactional
 public class AvatarService {
-
-    private final Path path;
+    @Value("${application.avatars-dir-name}")
+    private String avatarsDirName;
+    // private final Path path;
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
 
     public AvatarService(AvatarRepository avatarRepository,
+                         StudentRepository studentRepository) {
+        this.avatarRepository = avatarRepository;
+        this.studentRepository = studentRepository;
+    }
+
+    /*public AvatarService(AvatarRepository avatarRepository,
                          StudentRepository studentRepository,
                          @Value("${application.avatars-dir-name}") String avatarsDirName) {
         this.avatarRepository = avatarRepository;
         path = Path.of(avatarsDirName);
         this.studentRepository = studentRepository;
-    }
+    }*/
 
     @Transactional
     public void uploadAvatar(Long studentId, MultipartFile multipartFile) {
         try {
-            Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException(studentId));
+            /*Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException(studentId));
             String extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
             Path avatarPath = path.resolve(UUID.randomUUID() + "." + extension);
             Files.createDirectories(avatarPath.getParent());
@@ -61,20 +67,24 @@ public class AvatarService {
             avatar.setFileSize(multipartFile.getSize());
             avatar.setMediaType(multipartFile.getContentType());
             avatar.setData(multipartFile.getBytes());
-            avatarRepository.save(avatar);
-           /* Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException(studentId));
+            avatarRepository.save(avatar);*/
+
+
+            Path path = Path.of(avatarsDirName);
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new StudentNotFoundException(studentId));
             byte[] data = multipartFile.getBytes();
             String extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
             Path avatarPath = path.resolve(UUID.randomUUID() + "." + extension);
             Files.write(avatarPath, data);
-            Avatar avatar =avatarRepository.findByStudent_Id(studentId)
+            Avatar avatar = avatarRepository.findByStudent_Id(studentId)
                     .orElseGet(Avatar::new);
             avatar.setStudent(student);
             avatar.setFilePath(avatarPath.toString());
             avatar.setFileSize(data.length);
             avatar.setMediaType(multipartFile.getContentType());
             avatar.setData(data);
-            avatarRepository.save(avatar);*/
+            avatarRepository.save(avatar);
         } catch (IOException e) {
             throw new AvatarProcessingException();
         }
@@ -96,4 +106,8 @@ public class AvatarService {
         }
     }
 
+    public List<Avatar> getAllAvatarsForPage(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber-1,pageSize);
+        return avatarRepository.findAll(pageRequest).getContent();
+    }
 }

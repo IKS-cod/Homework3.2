@@ -1,141 +1,82 @@
 package ru.hogwarts.school.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.exception.FacultyNotFoundExceptionForColor;
+import ru.hogwarts.school.exception.FacultyNotFoundExceptionForNameOrColor;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class FacultyServiceTest {
-    /*private FacultyService facultyService = new FacultyService();
+    @Mock
+    FacultyRepository facultyRepository;
+    @InjectMocks
+    FacultyService facultyService;
+
 
     @Test
-    void createFacultyTest() {
-        assertThatExceptionOfType(FacultyNotFoundException.class).isThrownBy(() -> facultyService.get(1L));
-        List<Faculty> facultyList = new ArrayList<>();
-        Faculty faculty1 = new Faculty(0L, "A", "D");
-        Faculty faculty2 = new Faculty(0L, "B", "D");
-        Faculty faculty3 = new Faculty(0L, "C", "D");
-        facultyList.add(faculty1);
-        facultyList.add(faculty2);
-        facultyList.add(faculty3);
-        facultyService.createFaculty(faculty1);
-        facultyService.createFaculty(faculty2);
-        facultyService.createFaculty(faculty3);
-        Faculty faculty = facultyService.get(1L);
-        System.out.println(faculty);
-        boolean flag = false;
-        for (Faculty f : facultyList) {
-            if (f.equals(faculty)) {
-                System.out.println(f.equals(faculty));
-                flag = true;
-                break;
-            }
-        }
-        assertThat(flag).isEqualTo(true);
+    void getFacultyNegativeTest() {
+        long id = 1L;
+        when(facultyRepository.findById(id)).thenReturn(Optional.empty());
+        Assertions.assertThatExceptionOfType(FacultyNotFoundException.class)
+                .isThrownBy(() -> facultyService.getFaculty(id));
     }
 
     @Test
-    void getTest() {
-        assertThatExceptionOfType(FacultyNotFoundException.class).isThrownBy(() -> facultyService.get(1L));
-        List<Faculty> facultyList = new ArrayList<>();
-        Faculty faculty1 = new Faculty(0L, "A", "D");
-        Faculty faculty2 = new Faculty(0L, "B", "D");
-        Faculty faculty3 = new Faculty(0L, "C", "D");
-        facultyList.add(faculty1);
-        facultyList.add(faculty2);
-        facultyList.add(faculty3);
-        facultyService.createFaculty(faculty1);
-        facultyService.createFaculty(faculty2);
-        facultyService.createFaculty(faculty3);
-        Faculty faculty = facultyService.get(1L);
-        System.out.println(faculty);
-        boolean flag = false;
-        for (Faculty f : facultyList) {
-            if (f.equals(faculty)) {
-                System.out.println(f.equals(faculty));
-                flag = true;
-                break;
-            }
-        }
-        assertThat(flag).isEqualTo(true);
+    void findAllByColorNegativeTest() {
+        String color = "red";
+        when(facultyRepository.findAllByColor(color)).thenReturn(Collections.emptyList());
+        Assertions.assertThatExceptionOfType(FacultyNotFoundExceptionForColor.class)
+                .isThrownBy(() -> facultyService.findAllByColor(color));
+
+
     }
 
     @Test
-    void findAllFacultyForColorTest() {
-        Faculty faculty1 = new Faculty(0L, "A", "D");
-        Faculty faculty2 = new Faculty(0L, "B", "D");
-        Faculty faculty3 = new Faculty(0L, "C", "D");
-        facultyService.createFaculty(faculty1);
-        facultyService.createFaculty(faculty2);
-        facultyService.createFaculty(faculty3);
-        assertThat(facultyService.findAllFacultyForColor("D").size()).isEqualTo(3);
-        System.out.println(facultyService.findAllFacultyForColor("D"));
+    void findByNameOrColorNegativeTest() {
+        String nameOrColor = "nameOrColor";
+        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor)).thenReturn(Collections.emptyList());
+        Assertions.assertThatExceptionOfType(FacultyNotFoundExceptionForNameOrColor.class)
+                .isThrownBy(() -> facultyService.findByNameOrColor(nameOrColor));
+
     }
 
     @Test
-    void editFacultyTest() {
-        assertThatExceptionOfType(FacultyNotFoundException.class).isThrownBy(() -> facultyService.get(1L));
-        List<Faculty> facultyList = new ArrayList<>();
-        Faculty faculty1 = new Faculty(0L, "A", "D");
-        Faculty faculty2 = new Faculty(0L, "B", "D");
-        Faculty faculty3 = new Faculty(0L, "C", "D");
-        facultyList.add(faculty1);
-        facultyList.add(faculty2);
-        facultyList.add(faculty3);
-        facultyService.createFaculty(faculty1);
-        facultyService.createFaculty(faculty2);
-        facultyService.createFaculty(faculty3);
-        Faculty faculty = facultyService.get(1L);
-        System.out.println(faculty);
-        boolean flag = false;
-        for (Faculty f : facultyList) {
-            if (f.equals(faculty)) {
-                System.out.println(f.equals(faculty));
-                flag = true;
-                break;
-            }
-        }
-        System.out.println("flag " + flag);
-        assertThat(flag).isEqualTo(true);
-        Faculty faculty4 = new Faculty(1L, "New", "New");
-        facultyService.editFaculty(1, faculty4);
-        assertThat(facultyService.get(1L).equals(faculty4)).isEqualTo(true);
-        System.out.println(facultyService.get(1L));
+    void updateFacultyNegativeTest() {
+        Faculty faculty = new Faculty();
+        long id = 1L;
+        when(facultyRepository.existsById(id)).thenReturn(false);
+        Assertions.assertThatExceptionOfType(FacultyNotFoundException.class)
+                .isThrownBy(() -> facultyService.updateFaculty(id,faculty));
+        //Почему не работает следующая проверка????????
+       /*when(facultyRepository.findById(id)).thenReturn(Optional.empty());
+        Assertions.assertThatExceptionOfType(FacultyNotFoundException.class)
+                .isThrownBy(() -> facultyService.updateFaculty(id, faculty));*/
     }
 
     @Test
-    void deleteFacultyTest() {
-        assertThatExceptionOfType(FacultyNotFoundException.class).isThrownBy(() -> facultyService.get(1L));
-        List<Faculty> facultyList = new ArrayList<>();
-        Faculty faculty1 = new Faculty(0L, "A", "D");
-        Faculty faculty2 = new Faculty(0L, "B", "D");
-        Faculty faculty3 = new Faculty(0L, "C", "D");
-        facultyList.add(faculty1);
-        facultyList.add(faculty2);
-        facultyList.add(faculty3);
-        facultyService.createFaculty(faculty1);
-        facultyService.createFaculty(faculty2);
-        facultyService.createFaculty(faculty3);
-        Faculty faculty = facultyService.get(1L);
-        System.out.println(faculty);
-        boolean flag = false;
-        for (Faculty f : facultyList) {
-            if (f.equals(faculty)) {
-                System.out.println(f.equals(faculty));
-                flag = true;
-                break;
-            }
-        }
-        assertThat(flag).isEqualTo(true);
-        facultyService.deleteFaculty(1L);
-        assertThatExceptionOfType(FacultyNotFoundException.class).isThrownBy(() -> facultyService.get(1L));
-    }*/
+    void deleteFacultyNegativeTest() {
+        long id = 1L;
+        when(facultyRepository.existsById(id)).thenReturn(false);
+        Assertions.assertThatExceptionOfType(FacultyNotFoundException.class)
+                .isThrownBy(() -> facultyService.deleteFaculty(id));
+
+    }
+
+
 }

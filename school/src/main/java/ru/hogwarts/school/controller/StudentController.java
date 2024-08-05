@@ -11,7 +11,7 @@ import ru.hogwarts.school.service.AvatarService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -56,21 +56,22 @@ public class StudentController {
     }
 
     @GetMapping("/{id}/faculty")
-    public Faculty findStudentsFaculty(@PathVariable long id){
+    public Faculty findStudentsFaculty(@PathVariable long id) {
         return studentService.findStudentsFaculty(id);
     }
 
     @GetMapping("/{id}/avatar-from-db")
-    public ResponseEntity<byte[]> getAvatarFromDb(@PathVariable long id){
+    public ResponseEntity<byte[]> getAvatarFromDb(@PathVariable long id) {
         return buildResponseEntity(avatarService.getAvatarFromDb(id));
     }
+
     @GetMapping("/{id}/avatar-from-fs")
-    public ResponseEntity<byte[]> getAvatarFromFs(@PathVariable long id){
+    public ResponseEntity<byte[]> getAvatarFromFs(@PathVariable long id) {
         return buildResponseEntity(avatarService.getAvatarFromFs(id));
     }
 
-    public ResponseEntity<byte[]> buildResponseEntity(Pair<byte[],String> pair){
-        byte[]data=pair.getFirst();
+    public ResponseEntity<byte[]> buildResponseEntity(Pair<byte[], String> pair) {
+        byte[] data = pair.getFirst();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentLength(data.length)
@@ -78,5 +79,19 @@ public class StudentController {
                 .body(data);
     }
 
+    @GetMapping("/count")
+    public long getCountStudents() {
+        return studentService.getCountStudents();
+    }
+
+    @GetMapping("/age-avg")
+    public double getAvgAgeStudents() {
+        return studentService.getAvgAgeStudents();
+    }
+
+    @GetMapping("/desc-five")
+    public List<Student> getDescFiveStudents() {
+        return studentService.getDescFiveStudents();
+    }
 
 }
