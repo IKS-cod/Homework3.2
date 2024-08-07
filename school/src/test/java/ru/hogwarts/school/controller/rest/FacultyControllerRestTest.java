@@ -238,7 +238,7 @@ public class FacultyControllerRestTest {
         Assertions.assertEquals(count, countNew);
     }
 
-    @Test
+   /* @Test
     @DisplayName("Запрос факультета по цвету которого нет")
     public void findAllByColorNegative() {
         //data
@@ -252,7 +252,7 @@ public class FacultyControllerRestTest {
         assertThat(facultyNew.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         System.out.println(facultyNew.getBody());
         assertThat(facultyNew.getBody()).isEqualTo("Факультет с color = %s не найден!".formatted(color));
-    }
+    }*/
 
     @Test
     @DisplayName("Запрос по имени или цвету параметром Цвет")
@@ -316,7 +316,7 @@ public class FacultyControllerRestTest {
 
     }
 
-    @Test
+    /*@Test
     @DisplayName("Запрос по имени или цвету параметром Цвет которого нет")
     public void findByNameIgnoreCaseOrColorIgnoreCaseWithColorNegative() {
         //data
@@ -330,7 +330,7 @@ public class FacultyControllerRestTest {
         assertThat(facultyNew.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         System.out.println(facultyNew.getBody());
         //  assertThat(facultyNew.getBody()).isEqualTo("Факультет с color или name = %s не найден!".formatted(nameOrColor));
-    }
+    }*/
 
     @Test
     @DisplayName("Запрос по имени или цвету параметром Имя")

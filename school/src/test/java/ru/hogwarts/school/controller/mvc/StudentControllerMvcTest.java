@@ -9,7 +9,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.hogwarts.school.controller.StudentController;
+import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -20,6 +23,7 @@ import ru.hogwarts.school.service.StudentService;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -96,6 +100,15 @@ public class StudentControllerMvcTest {
                 .andExpect(jsonPath("$.age").value(student1.getAge()));
 
     }
+    @Test
+    @DisplayName("Найти студента по id которого нет")
+    void getStudentNegative() throws Exception {
+        long id = 1;
+        when(studentRepository.findById(id)).thenThrow(StudentNotFoundException.class);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/{id}", id))
+                .andExpect(result -> assertInstanceOf(StudentNotFoundException.class, result.getResolvedException()));
+    }
 
     @Test
     @DisplayName("Создать студента")
@@ -141,9 +154,66 @@ public class StudentControllerMvcTest {
                 .andExpect(status().isOk());
         verify(studentRepository, times(1)).save(any());
 
-
     }
+    @Test
+    @DisplayName("Заменить студента по id проверка исключений StudentNotFoundException")
+    void updateStudentNegative1() throws Exception {
+        //data
+        long id = 1L;
+        Faculty faculty = new Faculty();
+        faculty.setColor("red");
+        faculty.setName(faker.harryPotter().house());
+        faculty.setId(id);
 
+        Student student1 = new Student();
+        student1.setId(id);
+        student1.setAge(10);
+        student1.setName(faker.harryPotter().character());
+        student1.setFaculty(faculty);
+
+        Student student2 = new Student();
+        student2.setId(id);
+        student2.setAge(12);
+        student2.setName(faker.harryPotter().character());
+        student2.setFaculty(faculty);
+        when(studentRepository.findById(id)).thenThrow(StudentNotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/student/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(student2.toString()))
+                .andExpect(result -> assertInstanceOf(StudentNotFoundException.class, result.getResolvedException()));
+    }
+    @Test
+    @DisplayName("Заменить студента по id проверка исключений FacultyNotFoundException")
+    void updateStudentNegative2() throws Exception {
+        //data
+        long id = 1L;
+        Faculty faculty = new Faculty();
+        faculty.setColor("red");
+        faculty.setName(faker.harryPotter().house());
+        faculty.setId(id);
+
+        Student student1 = new Student();
+        student1.setId(id);
+        student1.setAge(10);
+        student1.setName(faker.harryPotter().character());
+        student1.setFaculty(faculty);
+
+        Student student2 = new Student();
+        student2.setId(id);
+        student2.setAge(12);
+        student2.setName(faker.harryPotter().character());
+        student2.setFaculty(faculty);
+        when(studentRepository.findById(id)).thenReturn(Optional.of(student1));
+        when(facultyRepository.findById(id)).thenThrow(FacultyNotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/student/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(student2.toString()))
+                .andExpect(result -> assertInstanceOf(FacultyNotFoundException.class, result.getResolvedException()));
+    }
     @Test
     @DisplayName("Удалить студента по id")
     void deleteStudent() throws Exception {
@@ -163,20 +233,15 @@ public class StudentControllerMvcTest {
         verify(studentRepository, times(1)).deleteById(any());
 
     }
-    /*@Test
+    @Test
     @DisplayName("Негативный тест удалить студента по id которого нет")
     void deleteStudentNegative() throws Exception {
-        //data
-        long id = 1L;
-
-        when(studentRepository.existsById(any())).thenReturn(false);
-        when(studentRepository.findById(1L)).thenThrow(StudentNotFoundException.class);
-        //test, check
-        mockMvc.perform(delete("/student/" + id)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(e);
-        verify(studentRepository, times(1)).deleteById(any());
-    }*/
+        long id = 1;
+        when(studentRepository.existsById(id)).thenThrow(StudentNotFoundException.class);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/student/{id}", id))
+                .andExpect(result -> assertInstanceOf(StudentNotFoundException.class, result.getResolvedException()));
+    }
 
     @Test
     @DisplayName("Найти факультет по id студента")
