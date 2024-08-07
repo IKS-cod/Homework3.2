@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -84,12 +84,14 @@ public class StudentControllerMvcTest {
     @Test
     @DisplayName("Найти студента по id")
     void getStudent() throws Exception {
+        long id = 1L;
         Student student1 = new Student();
-        student1.setId(1L);
+        student1.setId(id);
         student1.setAge(15);
         student1.setName(faker.harryPotter().character());
         when(studentRepository.findById(1L)).thenReturn(Optional.of(student1));
-        mockMvc.perform(get("/student/1"))
+        mockMvc.perform(get("/student/{id}", id))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(student1.getName()))
                 .andExpect(jsonPath("$.age").value(student1.getAge()));
 
@@ -107,39 +109,100 @@ public class StudentControllerMvcTest {
                 .andExpect(jsonPath("$.name").value(student1.getName()))
                 .andExpect(jsonPath("$.age").value(student1.getAge()));
     }
-   /* @Test
-    @DisplayName("Удалить студента")
-    void deleteStudent() throws Exception {
+
+    @Test
+    @DisplayName("Заменить студента по id")
+    void updateStudent() throws Exception {
+        //data
+        long id = 1L;
+        Faculty faculty = new Faculty();
+        faculty.setColor("red");
+        faculty.setName(faker.harryPotter().house());
+        faculty.setId(id);
+
         Student student1 = new Student();
-        student1.setId(1L);
+        student1.setId(id);
         student1.setAge(10);
         student1.setName(faker.harryPotter().character());
+        student1.setFaculty(faculty);
+
+        Student student2 = new Student();
+        student2.setId(id);
+        student2.setAge(12);
+        student2.setName(faker.harryPotter().character());
+        student2.setFaculty(faculty);
+
+        when(studentRepository.findById(id)).thenReturn(Optional.of(student1));
+
+        //test, check
+        mockMvc.perform(put("/student/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(student2.toString()))
+                .andExpect(status().isOk());
+        verify(studentRepository, times(1)).save(any());
+
+
+    }
+
+    @Test
+    @DisplayName("Удалить студента по id")
+    void deleteStudent() throws Exception {
+        //data
+        long id = 1L;
+        Student student1 = new Student();
+        student1.setId(id);
+        student1.setAge(10);
+        student1.setName(faker.harryPotter().character());
+
+        when(studentRepository.existsById(any())).thenReturn(true);
         when(studentRepository.findById(1L)).thenReturn(Optional.of(student1));
-        studentRepository.deleteById(1L);
-        mockMvc.perform(delete("/student/1")
+        //test, check
+        mockMvc.perform(delete("/student/" + id)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(status().isOk());
+        verify(studentRepository, times(1)).deleteById(any());
+
+    }
+    /*@Test
+    @DisplayName("Негативный тест удалить студента по id которого нет")
+    void deleteStudentNegative() throws Exception {
+        //data
+        long id = 1L;
+
+        when(studentRepository.existsById(any())).thenReturn(false);
+        when(studentRepository.findById(1L)).thenThrow(StudentNotFoundException.class);
+        //test, check
+        mockMvc.perform(delete("/student/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(e);
+        verify(studentRepository, times(1)).deleteById(any());
     }*/
 
     @Test
     @DisplayName("Найти факультет по id студента")
     void findStudentsFaculty() throws Exception {
+        //data
+        long id = 1L;
+        String name = faker.harryPotter().house();
+        String color = faker.color().name();
         Faculty faculty = new Faculty();
-        faculty.setColor(faker.color().name());
-        faculty.setName(faker.harryPotter().house());
-        faculty.setId(1L);
+        faculty.setColor(color);
+        faculty.setName(name);
+        faculty.setId(id);
         Student student1 = new Student();
-        student1.setId(1L);
+        student1.setId(id);
         student1.setAge(10);
         student1.setName(faker.harryPotter().character());
         student1.setFaculty(faculty);
 
-        when(studentRepository.findById(1L)).thenReturn(Optional.of(student1));
-        mockMvc.perform(get("/student/1/faculty")
+        when(studentRepository.existsById(any())).thenReturn(true);
+        when(studentRepository.findById(id)).thenReturn(Optional.of(student1));
+        //test, check
+        mockMvc.perform(get("/student/" + id + "/faculty")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.faculty").value(faculty));
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.color").value(color));
     }
 
 

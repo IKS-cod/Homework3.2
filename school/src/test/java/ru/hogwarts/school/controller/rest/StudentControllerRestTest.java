@@ -109,7 +109,7 @@ public class StudentControllerRestTest {
     @Test
     @DisplayName("Запрос студентов по min/max возрасту")
     public void findStudentByAgeBetween() {
-        int minAge = faker.random().nextInt(10, 30);
+        int minAge = faker.random().nextInt(10, 15);
         int maxAge = faker.random().nextInt(minAge, 60);
 
         Faculty faculty = createFaculty();
@@ -298,7 +298,7 @@ public class StudentControllerRestTest {
     private Student createStudent() {
         Student student = new Student();
         student.setName(faker.name().name());
-        student.setAge(faker.random().nextInt(10, 60));
+        student.setAge(faker.random().nextInt(20, 50));
         return student;
     }
 

@@ -26,24 +26,24 @@ import java.util.UUID;
 @Transactional
 public class AvatarService {
     @Value("${application.avatars-dir-name}")
-    private String avatarsDirName;
-    // private final Path path;
+   // private String avatarsDirName;
+     private final Path path;
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
 
-    public AvatarService(AvatarRepository avatarRepository,
+    /*public AvatarService(AvatarRepository avatarRepository,
                          StudentRepository studentRepository) {
         this.avatarRepository = avatarRepository;
         this.studentRepository = studentRepository;
-    }
+    }*/
 
-    /*public AvatarService(AvatarRepository avatarRepository,
+    public AvatarService(AvatarRepository avatarRepository,
                          StudentRepository studentRepository,
                          @Value("${application.avatars-dir-name}") String avatarsDirName) {
         this.avatarRepository = avatarRepository;
         path = Path.of(avatarsDirName);
         this.studentRepository = studentRepository;
-    }*/
+    }
 
     @Transactional
     public void uploadAvatar(Long studentId, MultipartFile multipartFile) {
@@ -70,7 +70,7 @@ public class AvatarService {
             avatarRepository.save(avatar);*/
 
 
-            Path path = Path.of(avatarsDirName);
+           // Path path = Path.of(avatarsDirName);
             Student student = studentRepository.findById(studentId)
                     .orElseThrow(() -> new StudentNotFoundException(studentId));
             byte[] data = multipartFile.getBytes();
@@ -107,6 +107,9 @@ public class AvatarService {
     }
 
     public List<Avatar> getAllAvatarsForPage(Integer pageNumber, Integer pageSize) {
+        if(pageNumber==0){
+            throw new IllegalArgumentException();
+        }
         PageRequest pageRequest = PageRequest.of(pageNumber-1,pageSize);
         return avatarRepository.findAll(pageRequest).getContent();
     }

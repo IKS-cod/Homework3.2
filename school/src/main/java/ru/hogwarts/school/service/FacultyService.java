@@ -2,14 +2,13 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
-import ru.hogwarts.school.exception.FacultyNotFoundExceptionForColor;
-import ru.hogwarts.school.exception.FacultyNotFoundExceptionForNameOrColor;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 public class FacultyService {
@@ -30,25 +29,20 @@ public class FacultyService {
     }
 
     public Collection<Faculty> findAllByColor(String color) {
-        if (facultyRepository.findAllByColor(color).isEmpty()) {
+        /*if (facultyRepository.findAllByColor(color).isEmpty()) {
             throw new FacultyNotFoundExceptionForColor(color);
-        }
+        }*/
         return facultyRepository.findAllByColor(color);
     }
 
     public Collection<Faculty> findByNameOrColor(String nameOrColor) {
-        if (facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor).isEmpty()){
+       /* if (facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor).isEmpty()){
             throw new FacultyNotFoundExceptionForNameOrColor(nameOrColor);
-        }
+        }*/
         return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor);
     }
 
     public void updateFaculty(long id, Faculty faculty) {
-        if (!facultyRepository.existsById(id)) {  //Все просто — findById()возвращает объект, который вы ищете,
-            // existsById()возвращает true/false независимо от того, существует
-            //  ли сущность в репозитории.
-            throw new FacultyNotFoundException(id);
-        }
         Faculty oldfaculty = facultyRepository.findById(id).orElseThrow(() -> new FacultyNotFoundException(id));
         oldfaculty.setName(faculty.getName());
         oldfaculty.setColor(faculty.getColor());
@@ -60,7 +54,9 @@ public class FacultyService {
         if (!facultyRepository.existsById(id)) {
             throw new FacultyNotFoundException(id);
         }
+
         facultyRepository.deleteById(id);
+
     }
 
     public List<Student> findStudentsByFacultyId(long id) {

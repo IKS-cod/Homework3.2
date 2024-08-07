@@ -22,11 +22,11 @@ public class FacultyController {
         return facultyService.getFaculty(id);
     }
     @GetMapping(params = "color")
-    public Collection<Faculty> findAllByColor(@RequestParam(required = false) String color){
+    public Collection<Faculty> findAllByColor(@RequestParam/*(required = false) */String color){
         return facultyService.findAllByColor(color);
     }
     @GetMapping(params = "nameOrColor")
-    public Collection<Faculty> findByNameIgnoreCaseOrColorIgnoreCase(@RequestParam(required = false) String nameOrColor){
+    public Collection<Faculty> findByNameIgnoreCaseOrColorIgnoreCase(@RequestParam/*(required = false)*/ String nameOrColor){
         return facultyService.findByNameOrColor(nameOrColor);
     }
 

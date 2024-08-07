@@ -45,8 +45,8 @@ public class FacultyControllerRestTest {
 
     @AfterEach
     void clear() {
-        facultyRepository.deleteAll();
         studentRepository.deleteAll();
+        facultyRepository.deleteAll();
     }
 
     @Test
@@ -392,53 +392,49 @@ public class FacultyControllerRestTest {
         Assertions.assertEquals(facultyCollection.getStatusCode(), HttpStatusCode.valueOf(200));
         Assertions.assertEquals(count, countNew);
     }
-    /*@Test
+
+    @Test
     @DisplayName("Студенты по id факультета")
     public void findStudentsByFacultyId() {
         //data
         Faculty faculty1 = createFaculty();
-        faculty1.setId(1L);
-        faculty1 = facultyRepository.save(faculty1);
-        System.out.println(faculty1);
-        Student student = createStudent(faculty1);
-        student.setId(1L);
-        studentRepository.save(student);
-        // student=studentRepository.save(student);
-        // System.out.println(student);
-        // Student student2 = createStudent(faculty1);
-        *//*Student student3 = createStudent(faculty1);
+        facultyRepository.save(faculty1);
+
+        Student student1 = createStudent(faculty1);
+        Student student2 = createStudent(faculty1);
+        Student student3 = createStudent(faculty1);
         Student student4 = createStudent(faculty1);
         Student student5 = createStudent(faculty1);
-        Student student6 = createStudent(faculty2);
-        Student student7 = createStudent(faculty2);
-        Student student8 = createStudent(faculty2);
-        Student student9 = createStudent(faculty2);
-        Student student10 = createStudent(faculty2);
-        // studentRepository.save(student1);
+        List<Student> studentList = new ArrayList<>();
+        studentList.add(student1);
+        studentList.add(student2);
+        studentList.add(student3);
+        studentList.add(student4);
+        studentList.add(student5);
+
+        studentRepository.save(student1);
         studentRepository.save(student2);
         studentRepository.save(student3);
         studentRepository.save(student4);
         studentRepository.save(student5);
-        studentRepository.save(student6);
-        studentRepository.save(student7);
-        studentRepository.save(student8);
-        studentRepository.save(student9);
-        studentRepository.save(student10);*//*
-        //Assertions.assertEquals(studentRepository.count(),10);
-        //Assertions.assertEquals(2, facultyRepository.count());
+
+        Assertions.assertEquals(studentRepository.count(), 5);
+        Assertions.assertEquals(1, facultyRepository.count());
 
         //test
-        *//*long id = faculty1.getId();
-        ResponseEntity<Collection<Student>> studentCollection =
+        long id = student1.getFaculty().getId();
+        ResponseEntity<List<Student>> studentCollection =
                 testRestTemplate.exchange("http://localhost:" + port + "/faculty/" + id + "/students",
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {
-                        });*//*
+                        });
+        List<Student> students = studentCollection.getBody();
+        System.out.println(students);
         //check
-
-
-    }*/
+        Assertions.assertEquals(studentCollection.getStatusCode(), HttpStatusCode.valueOf(200));
+        assertThat(students).isEqualTo(studentList);
+    }
 
     private Faculty createFaculty() {
         Faculty faculty = new Faculty();
