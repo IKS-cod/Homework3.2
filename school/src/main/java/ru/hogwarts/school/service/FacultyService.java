@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Service
 public class FacultyService {
+    private static final Logger logger = LoggerFactory.getLogger(FacultyService.class);
     private final FacultyRepository facultyRepository;
     private final StudentRepository studentRepository;
 
@@ -21,14 +24,20 @@ public class FacultyService {
     }
 
     public Faculty createFaculty(Faculty faculty) {
+        logger.info("Was invoked method for \"createFaculty\"");
         return facultyRepository.save(faculty);
     }
 
     public Faculty getFaculty(long id) {
-        return facultyRepository.findById(id).orElseThrow(() -> new FacultyNotFoundException(id));
+        logger.info("Was invoked method for \"getFaculty\"");
+        return facultyRepository.findById(id).orElseThrow(() ->{
+            logger.error("There is not faculty with id = " + id);
+            return new FacultyNotFoundException(id);
+        });
     }
 
     public Collection<Faculty> findAllByColor(String color) {
+        logger.info("Was invoked method for \"findAllByColor\"");
         /*if (facultyRepository.findAllByColor(color).isEmpty()) {
             throw new FacultyNotFoundExceptionForColor(color);
         }*/
@@ -36,6 +45,7 @@ public class FacultyService {
     }
 
     public Collection<Faculty> findByNameOrColor(String nameOrColor) {
+        logger.info("Was invoked method for \"findByNameOrColor\"");
        /* if (facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor).isEmpty()){
             throw new FacultyNotFoundExceptionForNameOrColor(nameOrColor);
         }*/
@@ -43,7 +53,11 @@ public class FacultyService {
     }
 
     public void updateFaculty(long id, Faculty faculty) {
-        Faculty oldfaculty = facultyRepository.findById(id).orElseThrow(() -> new FacultyNotFoundException(id));
+        logger.info("Was invoked method for \"updateFaculty\"");
+        Faculty oldfaculty = facultyRepository.findById(id).orElseThrow(() ->{
+            logger.error("There is not faculty with id = " + id);
+            return new FacultyNotFoundException(id);
+        });
         oldfaculty.setName(faculty.getName());
         oldfaculty.setColor(faculty.getColor());
         facultyRepository.save(oldfaculty);
@@ -51,7 +65,9 @@ public class FacultyService {
     }
 
     public void deleteFaculty(long id) {
+        logger.info("Was invoked method for \"deleteFaculty\"");
         if (!facultyRepository.existsById(id)) {
+            logger.error("There is not faculty with id = " + id);
             throw new FacultyNotFoundException(id);
         }
 
@@ -60,6 +76,7 @@ public class FacultyService {
     }
 
     public List<Student> findStudentsByFacultyId(long id) {
+        logger.info("Was invoked method for \"findStudentsByFacultyId\"");
         return studentRepository.findAllByFaculty_Id(id);
     }
 }
