@@ -10,6 +10,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -30,7 +31,7 @@ public class FacultyService {
 
     public Faculty getFaculty(long id) {
         logger.info("Was invoked method for \"getFaculty\"");
-        return facultyRepository.findById(id).orElseThrow(() ->{
+        return facultyRepository.findById(id).orElseThrow(() -> {
             logger.error("There is not faculty with id = " + id);
             return new FacultyNotFoundException(id);
         });
@@ -54,7 +55,7 @@ public class FacultyService {
 
     public void updateFaculty(long id, Faculty faculty) {
         logger.info("Was invoked method for \"updateFaculty\"");
-        Faculty oldfaculty = facultyRepository.findById(id).orElseThrow(() ->{
+        Faculty oldfaculty = facultyRepository.findById(id).orElseThrow(() -> {
             logger.error("There is not faculty with id = " + id);
             return new FacultyNotFoundException(id);
         });
@@ -78,5 +79,11 @@ public class FacultyService {
     public List<Student> findStudentsByFacultyId(long id) {
         logger.info("Was invoked method for \"findStudentsByFacultyId\"");
         return studentRepository.findAllByFaculty_Id(id);
+    }
+
+    public String getFacultyWithMaxName() {
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length)).orElseThrow();
     }
 }

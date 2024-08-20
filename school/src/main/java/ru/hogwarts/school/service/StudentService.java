@@ -12,6 +12,8 @@ import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class StudentService {
@@ -120,6 +122,29 @@ public class StudentService {
     public List<Student> getDescFiveStudents() {
         logger.info("Was invoked method for \"getDescFiveStudents\"");
         return studentRepository.getDescFiveStudents();
+    }
+
+    public List<String> getAllStudentWithNameOnLetterA() {
+        return studentRepository.findAll().stream()
+                .parallel()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith("A"))
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public double getAgeMediumAllStudent() {
+        return studentRepository.findAll().stream()
+                .parallel()
+                .collect(Collectors.averagingInt(Student::getAge));
+    }
+
+    public long getNumberTypeInt() {
+        return Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()
+                .reduce(0, (a, b) -> a + b);
     }
 
 }

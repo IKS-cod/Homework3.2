@@ -23,6 +23,7 @@ import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -412,6 +413,57 @@ public class FacultyControllerMvcTest {
         verify(studentRepository, times(1)).findAllByFaculty_Id(id);
 
     }
+    @Test
+    @DisplayName("Самое длинное название факультета")
+    void facultyWithMaxName() throws Exception {
+        //data
+        long id1 = 1L;
+        long id2 = 2L;
+        long id3 = 3L;
+        String name1 = "test";
+        String name2 = "testtest";
+        String name3 = "testtesttest";
+        String color = "red";
+        String nameOrColor = "red";
 
+        Faculty faculty1 = new Faculty();
+        faculty1.setName(name1);
+        faculty1.setId(id1);
+        faculty1.setColor(color);
+
+        Faculty faculty2 = new Faculty();
+        faculty2.setName(name2);
+        faculty2.setId(id2);
+        faculty2.setColor(color);
+
+        Faculty faculty3 = new Faculty();
+        faculty3.setName(name3);
+        faculty3.setId(id3);
+        faculty3.setColor(color);
+
+        List<Faculty> facultyList = new ArrayList<>();
+        facultyList.add(faculty1);
+        facultyList.add(faculty2);
+        facultyList.add(faculty3);
+
+        String facultyName = facultyList.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length)).orElseThrow();
+
+        when(facultyRepository.findAll()).thenReturn(facultyList);
+        System.out.println(facultyList);
+
+        //test
+        //check
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/facultyWithMaxName"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(facultyName));
+
+
+        verify(facultyRepository, times(1)).findAll();
+
+
+    }
 
 }

@@ -94,4 +94,17 @@ public class StudentController {
         return studentService.getDescFiveStudents();
     }
 
+    @GetMapping("/allStudentWithNameOnLetterA")
+    public List<String> getAllStudentWithNameOnLetterA() {
+        return studentService.getAllStudentWithNameOnLetterA();
+    }
+    @GetMapping("/ageMediumAllStudent")
+    public double getAgeMediumAllStudent() {
+        return studentService.getAgeMediumAllStudent();
+    }
+    @GetMapping("/numberTypeInt")
+    public long getNumberTypeInt() {
+        return studentService.getNumberTypeInt();
+    }
+
 }
