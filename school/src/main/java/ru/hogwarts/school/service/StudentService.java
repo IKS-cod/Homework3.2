@@ -21,6 +21,7 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
+    final Object object = new Object();
 
     public StudentService(StudentRepository studentRepository, FacultyRepository facultyRepository) {
         this.studentRepository = studentRepository;
@@ -146,5 +147,58 @@ public class StudentService {
                 .parallel()
                 .reduce(0, (a, b) -> a + b);
     }
+
+    int count = 0;
+
+    public void getNameStudentsInParallelMethod() {
+        List<String> namesFirstSixStudents = studentRepository.getFirstSixStudents();
+        System.out.println(namesFirstSixStudents);
+        printStudentsName(namesFirstSixStudents, 0);
+        printStudentsName(namesFirstSixStudents, 1);
+
+        new Thread(() -> {
+            printStudentsName(namesFirstSixStudents, 2);
+            printStudentsName(namesFirstSixStudents, 3);
+        }).start();
+
+        new Thread(() -> {
+            printStudentsName(namesFirstSixStudents, 4);
+            printStudentsName(namesFirstSixStudents, 5);
+
+        }).start();
+    }
+
+    public void getNameStudentsInParallelMethodWithSynchronized() {
+        List<String> namesFirstSixStudents = studentRepository.getFirstSixStudents();
+        System.out.println(namesFirstSixStudents);
+        printStudentsName(namesFirstSixStudents, 0);
+        printStudentsName(namesFirstSixStudents, 1);
+
+        new Thread(() -> {
+            synchronized (object){
+                printStudentsName(namesFirstSixStudents, 2);
+                printStudentsName(namesFirstSixStudents, 3);}
+        }).start();
+
+        new Thread(() -> {
+            synchronized (object){
+                printStudentsName(namesFirstSixStudents, 4);
+                printStudentsName(namesFirstSixStudents, 5);}
+        }).start();
+    }
+
+    void printStudentsName(List<String> name, int id) {
+        if (name.get(id) != null) {
+            System.out.println(name.get(id) + ", " + count);
+            count++;
+        }
+    }
+
+    /*synchronized void printStudentsNameWithSynchronized(List<String> name, int id) {
+        if (name.get(id) != null) {
+            System.out.println(name.get(id) + ", " + count);
+            count++;
+        }
+    }*/
 
 }

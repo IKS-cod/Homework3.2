@@ -98,13 +98,26 @@ public class StudentController {
     public List<String> getAllStudentWithNameOnLetterA() {
         return studentService.getAllStudentWithNameOnLetterA();
     }
+
     @GetMapping("/ageMediumAllStudent")
     public double getAgeMediumAllStudent() {
         return studentService.getAgeMediumAllStudent();
     }
+
     @GetMapping("/numberTypeInt")
     public long getNumberTypeInt() {
         return studentService.getNumberTypeInt();
     }
+
+    @GetMapping("/print-parallel")
+    public void getNameStudentsInParallelMethod() {
+        studentService.getNameStudentsInParallelMethod();
+    }
+
+    @GetMapping("/print-synchronized")
+    public void getNameStudentsInParallelMethodWithSynchronized() {
+        studentService.getNameStudentsInParallelMethodWithSynchronized();
+    }
+
 
 }
